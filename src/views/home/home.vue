@@ -3,11 +3,18 @@
     <navbar class="title">
       <div slot="center">购物车</div>
     </navbar>
+    <feature
+      :title="['流行','新款','精选']"
+      @tabClick="tabClick"
+      ref="tabControl2"
+      v-show="isFixed"
+      class="clone"
+    ></feature>
     <scroll class="wrap" ref="scroll" @getPosition="getPosition" @pullingUp="loadMore">
-      <home-swiper class="swiper" :banner="banner"></home-swiper>
+      <home-swiper class="swiper" :banner="banner" @tabCon="tabCon"></home-swiper>
       <recommend :recommend="recommend"></recommend>
       <tab-control></tab-control>
-      <feature :title="['流行','新款','精选']" @tabClick="tabClick"></feature>
+      <feature :title="['流行','新款','精选']" @tabClick="tabClick" ref="tabControl1"></feature>
       <good-list :goods="goods[currentType].list"></good-list>
     </scroll>
     <back-top @click.native="backTo" v-show="isShow"></back-top>
@@ -24,9 +31,11 @@ import goodList from 'components/content/goodlist/goodlist'
 import scroll from 'components/common/scroll/scroll'
 import backTop from 'components/content/backTop'
 import { getMultidata, getGoods } from 'network/home'
+import { clearTimeout, setTimeout } from 'timers';
 export default {
   data() {
     return {
+      isFixed: false,
       banner: [],
       recommend: [],
       goods: {
@@ -35,7 +44,8 @@ export default {
         'sell': { page: 0, list: [] }
       },
       currentType: 'pop',
-      isShow: false
+      isShow: false,
+      TaboffsetTop: 0
     }
   },
   created() {
@@ -57,16 +67,21 @@ export default {
           this.currentType = 'sell'
           break
       }
+      this.$refs.tabControl1.currentIndex = index
+      this.$refs.tabControl2.currentIndex = index
     },
     backTo() {
       this.$refs.scroll.scroll.scrollTo(0, 0, 500)
     },
     getPosition(position) {
       this.isShow = (-position.y > 1000) ? true : false
+      this.isFixed = (-position.y > this.TaboffsetTop) ? true : false
     },
     loadMore(pullingUp) {
       this.getGoods(this.currentType)
-
+    },
+    tabCon() {
+      this.TaboffsetTop = this.$refs.tabControl1.$el.offsetTop
     },
     /*
       网络请求
@@ -83,7 +98,25 @@ export default {
         this.goods[type].list.push(...res.data.list)
       })
       this.goods[type].page + 1
+    },
+    /**
+     节流
+     */
+    debounce(fn, delay) {
+      let timer
+      return function (...arg) {
+        if (timer) { clearTimeout(timer) }
+        timer = setTimeout(() => {
+          fn.apply(this, arg)
+        }, delay)
+      }
     }
+  },
+  mounted() {
+    let exe = this.debounce(this.$refs.scroll.refresh, 200)
+    this.$bus.$on('loadImg', () => {
+      exe()
+    })
   },
   components: {
     navbar,
@@ -100,11 +133,6 @@ export default {
 </script>
 <style  scoped>
 .title {
-  position: relative;
-  left: 0;
-  top: 0;
-  z-index: 90;
-  right: 0;
   text-align: center;
   background: var(--color-tint);
   line-height: 44px;
@@ -117,5 +145,10 @@ export default {
   bottom: 49px;
   z-index: 20;
   overflow: hidden;
+}
+.clone {
+  position: relative;
+  z-index: 30;
+  background: #fff;
 }
 </style>

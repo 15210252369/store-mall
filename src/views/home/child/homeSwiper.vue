@@ -3,7 +3,7 @@
     <swiper>
       <swiper-item v-for="(item,index) in banner" :key="index">
         <a :href="item.link">
-          <img :src="item.image" alt />
+          <img :src="item.image" alt @load="tabCon" />
         </a>
       </swiper-item>
     </swiper>
@@ -15,6 +15,7 @@ import { Swiper, SwiperItem } from 'components/common/swiper/index'
 export default {
   data() {
     return {
+      isLoad: false
     }
   },
   props: {
@@ -26,6 +27,14 @@ export default {
   components: {
     Swiper,
     SwiperItem
+  },
+  methods: {
+    tabCon() {
+      if (!this.isLoad) {
+        this.$emit('tabCon')
+      }
+      this.isLoad = true
+    }
   }
 }
 

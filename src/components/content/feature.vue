@@ -49,10 +49,5 @@ export default {
 .wrap-item.active span {
   border-bottom: 2px solid var(--color-high-text);
 }
-.wrapper {
-  position: sticky;
-  top: 44px;
-  z-index: 2;
-  background:#fff;
-}
+
 </style>

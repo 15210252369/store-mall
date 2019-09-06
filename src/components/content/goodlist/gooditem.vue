@@ -1,6 +1,6 @@
 <template>
   <div class="goods-item">
-    <img :src="good.show.img" />
+    <img :src="good.show.img" @load="loadImg" @click="skip" />
     <div class="goods-info">
       <p>{{good.title}}</p>
       <span class="price">{{good.price}}</span>
@@ -17,6 +17,14 @@ export default {
   },
   props: {
     good: Object
+  },
+  methods: {
+    loadImg() {
+      this.$bus.$emit('loadImg')
+    },
+    skip() {
+      this.$router.push('/detail' + this.good.iid)
+    }
   }
 }
 

@@ -28,6 +28,11 @@ export default {
       this.$emit('pullingUp')
       this.scroll.finishPullUp()
     })
+  },
+  methods: {
+    refresh() {
+      this.scroll.refresh()
+    }
   }
 }
 
