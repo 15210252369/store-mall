@@ -29,6 +29,7 @@ export default {
   methods: {
     change(index) {
       this.currentIndex = index
+      this.$emit('titleTab',index)
     }
   },
   components: {
